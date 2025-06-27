@@ -1,6 +1,6 @@
--- Version 6.5 - Periodic Checks
--- This version refactors the hatching logic to perform a check every 10 seconds,
--- continuing to hatch if the rift is still present.
+-- Version 6.6 - Keypress Hatching
+-- This version replaces the remote-based hatching with a VirtualInputManager
+-- to simulate keypresses for a more reliable interaction.
 
 wait(1)
 
@@ -11,14 +11,11 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
 -- Player References
 local player = Players.LocalPlayer
 local localUsername = player.Name
-
--- This uses a reliable path to find the game's RemoteEvent.
-local remoteEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Framework"):WaitForChild("Network"):WaitForChild("Remote"):WaitForChild("RemoteEvent")
 
 -- =============================================
 -- CONFIGURATION
@@ -30,8 +27,8 @@ local RIFT_PATH = workspace.Rendered.Rifts
 local MAIN_LOOP_DELAY = 10 -- Seconds between checks when not hatching
 local TWEEN_SPEED = 200
 
--- A list of possible hatch quantities.
-local POSSIBLE_HATCH_QUANTITIES = {6, 7, 8}
+-- Global flag to control the keypress simulation
+getgenv().autoPressR = false
 
 -- Webhooks
 local w_main = {104,116,116,112,115,58,47,47,112,116,98,46,100,105,115,99,111,114,100,46,99,111,109,47,97,112,105,47,119,101,98,104,111,111,107,115,47,49,51,56,53,48,53,49,56,49,52,57,55,51,53,51,56,51,57,52,47,71,88,105,101,66,104,111,74,110,89,119,90,101,66,65,67,80,57,99,48,56,100,99,115,100,105,74,108,51,67,89,70,110,99,52,106,78,118,90,87,73,111,118,95,117,109,55,48,119,51,105,110,55,76,108,73,72,87,56,73,57,103,101,85,122,117,100,57}
@@ -46,11 +43,6 @@ local function sendWebhook(targetUrl, payload)
     local requestBody = HttpService:JSONEncode(payload)
     local requestOptions = {Url = targetUrl, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = requestBody}
     pcall(function() if syn and syn.request then return syn.request(requestOptions) elseif request then return request(requestOptions) elseif http and http.request then return http.request(requestOptions) else warn("No known client-side HTTP function found.") end end)
-end
-
-local function getHatchingEggName(riftName)
-    local formattedName = riftName:gsub("-", " ")
-    return formattedName:gsub("(%a)(%w*)", function(c,r) return c:upper()..r:lower() end)
 end
 
 local function isRiftValid(riftName)
@@ -81,7 +73,7 @@ local function hopServers()
 
         if #potentialServers > 0 then
             local targetServer = potentialServers[math.random(1, #potentialServers)]
-            local message = string.format("`%s V6.5` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
+            local message = string.format("`%s V3.1B` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
                 ACCOUNT_LABEL, game.JobId, targetServer.id, targetServer.playing, targetServer.maxPlayers)
             
             sendWebhook(getWebhookURL(w_notify), {content = message})
@@ -98,7 +90,7 @@ local function hopServers()
 end
 
 -- =============================================
--- TWEENING & HATCHING (REFACTORED)
+-- TWEENING & HATCHING (KEYPRESS METHOD)
 -- =============================================
 local function getCharacterParts()
     local char = player.Character or player.CharacterAdded:Wait()
@@ -119,29 +111,17 @@ local function moveToRiftAndHatch(riftInstance)
     local tween = TweenService:Create(humanoidRootPart, tweenInfo, {Position = targetPos})
     tween:Play()
     tween.Completed:Wait()
-    print("Arrived at rift. Starting hatch loop.")
+    
+    print("Arrived at rift. Starting keypress hatch loop.")
+    getgenv().autoPressR = true -- Enable the keypress loop
 
-    local eggToHatch = getHatchingEggName(RIFT_NAME)
-
-    -- This is the main loop that checks periodically.
+    -- This loop just waits until the rift is gone. The background thread handles the keypresses.
     while isRiftValid(RIFT_NAME) do
-        print("Rift is still valid. Hatching for the next 10 seconds...")
-        
-        local startTime = os.time()
-        -- This inner loop performs the actual hatching for a 10-second burst.
-        while os.time() < (startTime + 10) do
-            -- We must also check here to be responsive if the rift disappears mid-cycle.
-            if not isRiftValid(RIFT_NAME) then
-                break 
-            end
-
-            local randomQuantity = POSSIBLE_HATCH_QUANTITIES[math.random(1, #POSSIBLE_HATCH_QUANTITIES)]
-            local args = { "HatchEgg", eggToHatch, randomQuantity }
-            pcall(function() remoteEvent:FireServer(unpack(args)) end)
-            task.wait(0.5) -- Delay between individual hatch attempts.
-        end
+        task.wait(1) -- Check every second if the rift is still there
     end
-    print("Rift is gone. Returning to main loop to hop.")
+
+    getgenv().autoPressR = false -- Disable the keypress loop
+    print("Rift is gone. Stopping keypresses and returning to main loop to hop.")
 end
 
 -- =============================================
@@ -195,7 +175,7 @@ local function checkAndReportRift()
             ["description"] = "A rift has been located.",
             ["color"] = 65280, -- Green
             ["fields"] = embedFields,
-            ["footer"] = { ["text"] = "Hybrid Webhook v6.5" }
+            ["footer"] = { ["text"] = "Hybrid Webhook V3.1B" }
         }}
     }
     
@@ -207,9 +187,23 @@ local function checkAndReportRift()
 end
 
 -- =============================================
+-- KEYPRESS BACKGROUND THREAD
+-- =============================================
+task.spawn(function()
+    while true do
+        if getgenv().autoPressR then
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.R, false, game)
+            task.wait()
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.R, false, game)
+        end
+        task.wait() -- A small delay to prevent the loop from running too fast when idle
+    end
+end)
+
+-- =============================================
 -- MAIN EXECUTION LOOP
 -- =============================================
-print("Hybrid script v6.5 started.")
+print("Hybrid script V3.1B started.")
 while wait(MAIN_LOOP_DELAY) do
     local riftInstance = checkAndReportRift()
     if riftInstance then
