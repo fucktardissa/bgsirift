@@ -1,6 +1,6 @@
--- Version 6.3 - Hybrid with Hatch & Tween
--- This version uses the user-provided HttpService hopping logic as the foundation
--- and integrates the advanced tweening and hatching systems.
+-- Version 6.4 - Corrected Hybrid
+-- This version uses the EXACT HttpService server hopping logic provided by the user,
+-- combined with the advanced tweening and hatching systems.
 
 wait(1)
 
@@ -23,18 +23,15 @@ local remoteEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Frame
 -- =============================================
 -- CONFIGURATION
 -- =============================================
-local ACCOUNT_LABEL = "help" 
+local ACCOUNT_LABEL = "Account 6" 
 local MAX_PLAYER_COUNT = 10
 local RIFT_NAME = "spikey-egg"
 local RIFT_PATH = workspace.Rendered.Rifts
-local MAIN_LOOP_DELAY = 5 -- Seconds between checks when not hatching
+local MAIN_LOOP_DELAY = 10 -- Seconds between checks when not hatching
 local TWEEN_SPEED = 200
 
 -- A list of possible hatch quantities.
 local POSSIBLE_HATCH_QUANTITIES = {1, 3, 6, 7, 8}
-
--- A flag to prevent the script from trying to act while a teleport is in progress.
-local isHopping = false
 
 -- Webhooks
 local w_main = {104,116,116,112,115,58,47,47,112,116,98,46,100,105,115,99,111,114,100,46,99,111,109,47,97,112,105,47,119,101,98,104,111,111,107,115,47,49,51,56,53,48,53,49,56,49,52,57,55,51,53,51,56,51,57,52,47,71,88,105,101,66,104,111,74,110,89,119,90,101,66,65,67,80,57,99,48,56,100,99,115,100,105,74,108,51,67,89,70,110,99,52,106,78,118,90,87,73,111,118,95,117,109,55,48,119,51,105,110,55,76,108,73,72,87,56,73,57,103,101,85,122,117,100,57}
@@ -65,12 +62,9 @@ local function isRiftValid(riftName)
 end
 
 -- =============================================
--- SERVER HOPPING
+-- SERVER HOPPING (USER-PROVIDED LOGIC)
 -- =============================================
 local function hopServers()
-    if isHopping then return end
-    isHopping = true
-    
     print("Finding a random, non-full server...")
     local potentialServers = {}
     local success, body = pcall(function()
@@ -87,23 +81,20 @@ local function hopServers()
 
         if #potentialServers > 0 then
             local targetServer = potentialServers[math.random(1, #potentialServers)]
-            local message = string.format("`%s V6.3` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
+            local message = string.format("`%s V3B` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
                 ACCOUNT_LABEL, game.JobId, targetServer.id, targetServer.playing, targetServer.maxPlayers)
             
             sendWebhook(getWebhookURL(w_notify), {content = message})
             wait(1)
-            pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, targetServer.id, player) end)
+            pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, targetServer.id, Players.LocalPlayer) end)
         else
             print("No new servers found with space. Falling back to random join.")
-            pcall(function() TeleportService:Teleport(game.PlaceId, player) end)
+            pcall(function() TeleportService:Teleport(game.PlaceId, Players.LocalPlayer) end)
         end
     else
         warn("API hop failed. Falling back to random join.")
-        pcall(function() TeleportService:Teleport(game.PlaceId, player) end)
+        pcall(function() TeleportService:Teleport(game.PlaceId, Players.LocalPlayer) end)
     end
-    -- After attempting to teleport, wait a bit before allowing another hop to be initiated
-    task.wait(15)
-    isHopping = false
 end
 
 -- =============================================
@@ -192,7 +183,7 @@ local function checkAndReportRift()
             ["description"] = "A rift has been located.",
             ["color"] = 65280, -- Green
             ["fields"] = embedFields,
-            ["footer"] = { ["text"] = "Hybrid Webhook v6.3" }
+            ["footer"] = { ["text"] = "Hybrid Webhook v3B" }
         }}
     }
     
@@ -206,13 +197,8 @@ end
 -- =============================================
 -- MAIN EXECUTION LOOP
 -- =============================================
-print("Hybrid script v6.3 started.")
+print("Hybrid script v3B started.")
 while wait(MAIN_LOOP_DELAY) do
-    if isHopping then
-        print("Waiting for teleport to complete...")
-        continue
-    end
-
     local riftInstance = checkAndReportRift()
     if riftInstance then
         print("Rift found. Beginning hatching process.")
