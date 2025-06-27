@@ -1,6 +1,6 @@
--- Version 6.4 - Corrected Hybrid
--- This version uses the EXACT HttpService server hopping logic provided by the user,
--- combined with the advanced tweening and hatching systems.
+-- Version 6.5 - Periodic Checks
+-- This version refactors the hatching logic to perform a check every 10 seconds,
+-- continuing to hatch if the rift is still present.
 
 wait(1)
 
@@ -81,7 +81,7 @@ local function hopServers()
 
         if #potentialServers > 0 then
             local targetServer = potentialServers[math.random(1, #potentialServers)]
-            local message = string.format("`%s V3B` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
+            local message = string.format("`%s V6.5` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
                 ACCOUNT_LABEL, game.JobId, targetServer.id, targetServer.playing, targetServer.maxPlayers)
             
             sendWebhook(getWebhookURL(w_notify), {content = message})
@@ -98,7 +98,7 @@ local function hopServers()
 end
 
 -- =============================================
--- TWEENING & HATCHING
+-- TWEENING & HATCHING (REFACTORED)
 -- =============================================
 local function getCharacterParts()
     local char = player.Character or player.CharacterAdded:Wait()
@@ -121,13 +121,25 @@ local function moveToRiftAndHatch(riftInstance)
     tween.Completed:Wait()
     print("Arrived at rift. Starting hatch loop.")
 
-    -- Start hatching
     local eggToHatch = getHatchingEggName(RIFT_NAME)
+
+    -- This is the main loop that checks periodically.
     while isRiftValid(RIFT_NAME) do
-        local randomQuantity = POSSIBLE_HATCH_QUANTITIES[math.random(1, #POSSIBLE_HATCH_QUANTITIES)]
-        local args = { "HatchEgg", eggToHatch, randomQuantity }
-        pcall(function() remoteEvent:FireServer(unpack(args)) end)
-        task.wait(0.5)
+        print("Rift is still valid. Hatching for the next 10 seconds...")
+        
+        local startTime = os.time()
+        -- This inner loop performs the actual hatching for a 10-second burst.
+        while os.time() < (startTime + 10) do
+            -- We must also check here to be responsive if the rift disappears mid-cycle.
+            if not isRiftValid(RIFT_NAME) then
+                break 
+            end
+
+            local randomQuantity = POSSIBLE_HATCH_QUANTITIES[math.random(1, #POSSIBLE_HATCH_QUANTITIES)]
+            local args = { "HatchEgg", eggToHatch, randomQuantity }
+            pcall(function() remoteEvent:FireServer(unpack(args)) end)
+            task.wait(0.5) -- Delay between individual hatch attempts.
+        end
     end
     print("Rift is gone. Returning to main loop to hop.")
 end
@@ -183,7 +195,7 @@ local function checkAndReportRift()
             ["description"] = "A rift has been located.",
             ["color"] = 65280, -- Green
             ["fields"] = embedFields,
-            ["footer"] = { ["text"] = "Hybrid Webhook v3B" }
+            ["footer"] = { ["text"] = "Hybrid Webhook v6.5" }
         }}
     }
     
@@ -197,7 +209,7 @@ end
 -- =============================================
 -- MAIN EXECUTION LOOP
 -- =============================================
-print("Hybrid script v3B started.")
+print("Hybrid script v6.5 started.")
 while wait(MAIN_LOOP_DELAY) do
     local riftInstance = checkAndReportRift()
     if riftInstance then
