@@ -2,7 +2,7 @@
 -- This script combines the HttpService server hopping from the user's old script
 -- with the advanced tweening, hatching, and embed systems from previous versions.
 
-wait(7)
+wait(1)
 
 -- =============================================
 -- SERVICES & REFERENCES
