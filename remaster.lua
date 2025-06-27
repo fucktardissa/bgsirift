@@ -11,17 +11,15 @@ local localUsername = player.Name
 
 local ACCOUNT_LABEL = "yay" 
 local MAX_PLAYER_COUNT = 12
-local RIFT_NAME = "spikey-egg"
+local RIFT_NAME = "bruh-egg"
 local RIFT_PATH = workspace.Rendered.Rifts
 local MAIN_LOOP_DELAY = 1
 local TWEEN_SPEED = 200
 
 getgenv().autoPressR = false
 
-local w_main = {104,116,116,112,115,58,47,47,112,116,98,46,100,105,115,99,111,114,100,46,99,111,109,47,97,112,105,47,119,101,98,104,111,111,107,115,47,49,51,56,53,48,53,49,56,49,52,57,55,51,53,51,56,51,57,52,47,71,88,105,101,66,104,111,74,110,89,119,90,101,66,65,67,80,57,99,48,56,100,99,115,100,105,74,108,51,67,89,70,110,99,52,106,78,118,90,87,73,111,118,95,117,109,55,48,119,51,105,110,55,76,108,73,72,87,56,73,57,103,101,85,122,117,100,57}
-local w_notify = {104,116,116,112,115,58,47,47,112,116,98,46,100,105,115,99,111,114,100,46,99,111,109,47,97,112,105,47,119,101,98,104,111,111,107,115,47,49,51,54,56,55,49,48,56,50,54,57,52,48,51,48,53,52,53,57,47,66,50,122,56,114,98,101,65,102,89,108,77,95,99,110,71,56,73,81,110,87,104,103,69,66,100,45,107,101,83,76,107,90,66,71,97,87,104,73,67,88,75,78,111,81,95,70,111,51,103,75,110,48,72,111,74,99,78,52,80,50,122,102,55,86,72,69,50}
-
-local function getWebhookURL(tbl) local url = "" for i,v in ipairs(tbl) do url = url .. string.char(v) end return url end
+local w_main = "https://ptb.discord.com/api/webhooks/1385051814973538394/GXieBhoJnYwZeBACP9c08dcsdiJl3CYFnc4jNvZWIov_um70w3in7LlIHW8I9geUzud9"
+local w_notify = "https://ptb.discord.com/api/webhooks/1387886071718613091/E8pTZNyJSD9x1fTFiZTHhg7FoTB-V_sLyCyvCZlbIq3Qid6GIwSg5b4vZsdbyfw6KMTl"
 
 local function sendWebhook(targetUrl, payload)
     local requestBody = HttpService:JSONEncode(payload)
@@ -54,10 +52,10 @@ local function hopServers()
 
         if #potentialServers > 0 then
             local targetServer = potentialServers[math.random(1, #potentialServers)]
-            local message = string.format("`%s V6` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
-                ACCOUNT_LABEL, game.JobId, targetServer.id, targetServer.playing, targetServer.maxPlayers)
+            local message = string.format("`%s V6` | User **%s** is hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
+                ACCOUNT_LABEL, localUsername, game.JobId, targetServer.id, targetServer.playing, targetServer.maxPlayers)
             
-            sendWebhook(getWebhookURL(w_notify), {content = message})
+            sendWebhook(w_notify, {content = message})
             wait(1)
             pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, targetServer.id, Players.LocalPlayer) end)
         else
@@ -164,13 +162,13 @@ local function checkAndReportRift()
             ["description"] = "A rift has been located.",
             ["color"] = 65280,
             ["fields"] = embedFields,
-            ["footer"] = { ["text"] = "Webhook v6" }
+            ["footer"] = { ["text"] = "Webhook V6" }
         }}
     }
     
-    sendWebhook(getWebhookURL(w_main), payload)
+    sendWebhook(w_main, payload)
     wait(0.5)
-    sendWebhook(getWebhookURL(w_main), {content = joinLink})
+    sendWebhook(w_main, {content = joinLink})
 
     return riftInstance
 end
