@@ -1,6 +1,6 @@
--- Version 6.6 - Keypress Hatching
--- This version replaces the remote-based hatching with a VirtualInputManager
--- to simulate keypresses for a more reliable interaction.
+-- Version 6.7 - Precise Positioning
+-- This version changes the tweening target to a more accurate part within the rift
+-- to ensure the character is always in the correct hatching position.
 
 wait(1)
 
@@ -73,7 +73,7 @@ local function hopServers()
 
         if #potentialServers > 0 then
             local targetServer = potentialServers[math.random(1, #potentialServers)]
-            local message = string.format("`%s V3.1B` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
+            local message = string.format("`%s V6.7` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
                 ACCOUNT_LABEL, game.JobId, targetServer.id, targetServer.playing, targetServer.maxPlayers)
             
             sendWebhook(getWebhookURL(w_notify), {content = message})
@@ -99,7 +99,23 @@ end
 
 local function moveToRiftAndHatch(riftInstance)
     print("Moving to rift...")
-    local targetPos = riftInstance.Display.Position + Vector3.new(0, 3, -10)
+    local targetPos
+
+    -- Try to find the new, more accurate EggPlatformSpawn part
+    local eggPlatformSpawn = riftInstance:FindFirstChild("EggPlatformSpawn")
+    if eggPlatformSpawn then
+        local targetPart = eggPlatformSpawn:FindFirstChild("Part")
+        if targetPart and targetPart:IsA("BasePart") then
+            print("Found precise EggPlatformSpawn part. Targeting it.")
+            targetPos = targetPart.Position
+        end
+    end
+
+    -- If the new path wasn't found, fall back to the old Display part method
+    if not targetPos then
+        warn("Could not find EggPlatformSpawn part. Falling back to Display part.")
+        targetPos = riftInstance.Display.Position + Vector3.new(0, 3, -10)
+    end
     
     local humanoidRootPart, humanoid = getCharacterParts()
     if not humanoidRootPart or not humanoid then
@@ -175,7 +191,7 @@ local function checkAndReportRift()
             ["description"] = "A rift has been located.",
             ["color"] = 65280, -- Green
             ["fields"] = embedFields,
-            ["footer"] = { ["text"] = "Hybrid Webhook V3.1B" }
+            ["footer"] = { ["text"] = "Hybrid Webhook v6.7" }
         }}
     }
     
@@ -203,7 +219,7 @@ end)
 -- =============================================
 -- MAIN EXECUTION LOOP
 -- =============================================
-print("Hybrid script V3.1B started.")
+print("Hybrid script V6.7 started.")
 while wait(MAIN_LOOP_DELAY) do
     local riftInstance = checkAndReportRift()
     if riftInstance then
