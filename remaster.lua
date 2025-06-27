@@ -1,6 +1,6 @@
--- Version 6.7 - Precise Positioning
--- This version changes the tweening target to a more accurate part within the rift
--- to ensure the character is always in the correct hatching position.
+-- Version 6.8 - Logging Fix
+-- This version adds a print statement to the rift check loop to provide
+-- visual confirmation that the script is actively monitoring the rift's status.
 
 wait(1)
 
@@ -73,7 +73,7 @@ local function hopServers()
 
         if #potentialServers > 0 then
             local targetServer = potentialServers[math.random(1, #potentialServers)]
-            local message = string.format("`%s V6.7` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
+            local message = string.format("`%s V6.8` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
                 ACCOUNT_LABEL, game.JobId, targetServer.id, targetServer.playing, targetServer.maxPlayers)
             
             sendWebhook(getWebhookURL(w_notify), {content = message})
@@ -133,6 +133,7 @@ local function moveToRiftAndHatch(riftInstance)
 
     -- This loop just waits until the rift is gone. The background thread handles the keypresses.
     while isRiftValid(RIFT_NAME) do
+        print("Rift still exists, continuing to hatch...") -- ADDED THIS LOG
         task.wait(1) -- Check every second if the rift is still there
     end
 
@@ -191,7 +192,7 @@ local function checkAndReportRift()
             ["description"] = "A rift has been located.",
             ["color"] = 65280, -- Green
             ["fields"] = embedFields,
-            ["footer"] = { ["text"] = "Hybrid Webhook v6.7" }
+            ["footer"] = { ["text"] = "Hybrid Webhook v6.8" }
         }}
     }
     
@@ -219,7 +220,7 @@ end)
 -- =============================================
 -- MAIN EXECUTION LOOP
 -- =============================================
-print("Hybrid script V6.7 started.")
+print("Hybrid script V6.8 started.")
 while wait(MAIN_LOOP_DELAY) do
     local riftInstance = checkAndReportRift()
     if riftInstance then
