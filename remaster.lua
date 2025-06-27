@@ -24,8 +24,8 @@ local remoteEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Frame
 -- CONFIGURATION
 -- =============================================
 local ACCOUNT_LABEL = "help"
-local MAX_PLAYER_COUNT = 10
-local RIFT_NAME = "bruh-egg"
+local MAX_PLAYER_COUNT = 9
+local RIFT_NAME = "spikey-egg"
 local RIFT_PATH = workspace.Rendered.Rifts
 local MAIN_LOOP_DELAY = 10 -- Seconds between checks when not hatching
 local TWEEN_SPEED = 200
