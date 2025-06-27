@@ -1,42 +1,26 @@
--- Version 6.8 - Logging Fix
--- This version adds a print statement to the rift check loop to provide
--- visual confirmation that the script is actively monitoring the rift's status.
-
 wait(1)
 
--- =============================================
--- SERVICES & REFERENCES
--- =============================================
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 
--- Player References
 local player = Players.LocalPlayer
 local localUsername = player.Name
 
--- =============================================
--- CONFIGURATION
--- =============================================
-local ACCOUNT_LABEL = "Account 6" 
-local MAX_PLAYER_COUNT = 10
+local ACCOUNT_LABEL = "yay" 
+local MAX_PLAYER_COUNT = 12
 local RIFT_NAME = "spikey-egg"
 local RIFT_PATH = workspace.Rendered.Rifts
-local MAIN_LOOP_DELAY = 10 -- Seconds between checks when not hatching
+local MAIN_LOOP_DELAY = 1
 local TWEEN_SPEED = 200
 
--- Global flag to control the keypress simulation
 getgenv().autoPressR = false
 
--- Webhooks
 local w_main = {104,116,116,112,115,58,47,47,112,116,98,46,100,105,115,99,111,114,100,46,99,111,109,47,97,112,105,47,119,101,98,104,111,111,107,115,47,49,51,56,53,48,53,49,56,49,52,57,55,51,53,51,56,51,57,52,47,71,88,105,101,66,104,111,74,110,89,119,90,101,66,65,67,80,57,99,48,56,100,99,115,100,105,74,108,51,67,89,70,110,99,52,106,78,118,90,87,73,111,118,95,117,109,55,48,119,51,105,110,55,76,108,73,72,87,56,73,57,103,101,85,122,117,100,57}
 local w_notify = {104,116,116,112,115,58,47,47,112,116,98,46,100,105,115,99,111,114,100,46,99,111,109,47,97,112,105,47,119,101,98,104,111,111,107,115,47,49,51,54,56,55,49,48,56,50,54,57,52,48,51,48,53,52,53,57,47,66,50,122,56,114,98,101,65,102,89,108,77,95,99,110,71,56,73,81,110,87,104,103,69,66,100,45,107,101,83,76,107,90,66,71,97,87,104,73,67,88,75,78,111,81,95,70,111,51,103,75,110,48,72,111,74,99,78,52,80,50,122,102,55,86,72,69,50}
 
--- =============================================
--- UTILITY FUNCTIONS
--- =============================================
 local function getWebhookURL(tbl) local url = "" for i,v in ipairs(tbl) do url = url .. string.char(v) end return url end
 
 local function sendWebhook(targetUrl, payload)
@@ -53,9 +37,6 @@ local function isRiftValid(riftName)
     return nil
 end
 
--- =============================================
--- SERVER HOPPING (USER-PROVIDED LOGIC)
--- =============================================
 local function hopServers()
     print("Finding a random, non-full server...")
     local potentialServers = {}
@@ -73,7 +54,7 @@ local function hopServers()
 
         if #potentialServers > 0 then
             local targetServer = potentialServers[math.random(1, #potentialServers)]
-            local message = string.format("`%s V6.8` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
+            local message = string.format("`%s V6` | Hopping randomly.\n> **From:** `%s`\n> **To:** `%s`\n> **Players:** %d/%d",
                 ACCOUNT_LABEL, game.JobId, targetServer.id, targetServer.playing, targetServer.maxPlayers)
             
             sendWebhook(getWebhookURL(w_notify), {content = message})
@@ -89,9 +70,6 @@ local function hopServers()
     end
 end
 
--- =============================================
--- TWEENING & HATCHING (KEYPRESS METHOD)
--- =============================================
 local function getCharacterParts()
     local char = player.Character or player.CharacterAdded:Wait()
     return char:WaitForChild("HumanoidRootPart"), char:WaitForChild("Humanoid")
@@ -101,7 +79,6 @@ local function moveToRiftAndHatch(riftInstance)
     print("Moving to rift...")
     local targetPos
 
-    -- Try to find the new, more accurate EggPlatformSpawn part
     local eggPlatformSpawn = riftInstance:FindFirstChild("EggPlatformSpawn")
     if eggPlatformSpawn then
         local targetPart = eggPlatformSpawn:FindFirstChild("Part")
@@ -111,7 +88,6 @@ local function moveToRiftAndHatch(riftInstance)
         end
     end
 
-    -- If the new path wasn't found, fall back to the old Display part method
     if not targetPos then
         warn("Could not find EggPlatformSpawn part. Falling back to Display part.")
         targetPos = riftInstance.Display.Position + Vector3.new(0, 3, -10)
@@ -129,21 +105,17 @@ local function moveToRiftAndHatch(riftInstance)
     tween.Completed:Wait()
     
     print("Arrived at rift. Starting keypress hatch loop.")
-    getgenv().autoPressR = true -- Enable the keypress loop
+    getgenv().autoPressR = true
 
-    -- This loop just waits until the rift is gone. The background thread handles the keypresses.
     while isRiftValid(RIFT_NAME) do
-        print("Rift still exists, continuing to hatch...") -- ADDED THIS LOG
-        task.wait(1) -- Check every second if the rift is still there
+        print("Rift still exists, continuing to hatch...") 
+        task.wait(1)
     end
 
-    getgenv().autoPressR = false -- Disable the keypress loop
+    getgenv().autoPressR = false
     print("Rift is gone. Stopping keypresses and returning to main loop to hop.")
 end
 
--- =============================================
--- RIFT REPORTING (ENHANCED)
--- =============================================
 local function checkAndReportRift()
     local riftInstance = isRiftValid(RIFT_NAME)
     if not riftInstance then return nil end
@@ -178,7 +150,7 @@ local function checkAndReportRift()
     local embedFields = {
         { ["name"] = "Found By", ["value"] = localUsername .. " (`" .. ACCOUNT_LABEL .. "`)", ["inline"] = false },
         { ["name"] = "Rift Height", ["value"] = tostring(height) .. " meters", ["inline"] = false },
-        { ["name"] = "Players", ["value"] = string.format("%d/%d", playerCount, MAX_PLAYER_COUNT), ["inline"] = false }
+        { ["name"] = "Players", ["value"] = string.format("%d/12", playerCount), ["inline"] = false }
     }
     
     if luckValue and luckValue ~= "" then table.insert(embedFields, {["name"] = "Luck", ["value"] = luckValue, ["inline"] = false}) end
@@ -190,9 +162,9 @@ local function checkAndReportRift()
         ["embeds"] = {{
             ["title"] = RIFT_NAME .. " Found!",
             ["description"] = "A rift has been located.",
-            ["color"] = 65280, -- Green
+            ["color"] = 65280,
             ["fields"] = embedFields,
-            ["footer"] = { ["text"] = "Hybrid Webhook v6.8" }
+            ["footer"] = { ["text"] = "Webhook v6" }
         }}
     }
     
@@ -203,9 +175,6 @@ local function checkAndReportRift()
     return riftInstance
 end
 
--- =============================================
--- KEYPRESS BACKGROUND THREAD
--- =============================================
 task.spawn(function()
     while true do
         if getgenv().autoPressR then
@@ -213,19 +182,15 @@ task.spawn(function()
             task.wait()
             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.R, false, game)
         end
-        task.wait() -- A small delay to prevent the loop from running too fast when idle
+        task.wait()
     end
 end)
 
--- =============================================
--- MAIN EXECUTION LOOP
--- =============================================
-print("Hybrid script V6.8 started.")
+print("Script V6 started.")
 while wait(MAIN_LOOP_DELAY) do
     local riftInstance = checkAndReportRift()
     if riftInstance then
         print("Rift found. Beginning hatching process.")
-        -- This is a blocking call. The script will stay in this function until the rift is gone.
         moveToRiftAndHatch(riftInstance)
     else
         print("Rift not found. Hopping to a new server.")
