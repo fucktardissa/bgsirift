@@ -18,7 +18,7 @@ local remoteEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Frame
 -- =============================================
 -- CONFIGURATION
 -- =============================================
-local RIFT_NAME = "bruh-egg"
+local RIFT_NAME = "gift-rift"
 local RIFT_PATH = workspace.Rendered.Rifts
 local PING_ROLE_ID = "1387110078695473242"
 local THUMBNAIL_URL = "https://i.imgur.com/your_image_here.png" -- IMPORTANT: Replace with your desired image URL
