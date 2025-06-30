@@ -1,5 +1,5 @@
 -- Version 5.14 - Swapped main webhook for bug testing.
-wait(10)
+wait(1)
 
 -- =============================================
 -- SERVICES & REFERENCES
