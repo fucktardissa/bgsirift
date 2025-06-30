@@ -99,7 +99,7 @@ local function sendRiftReport(riftInstance)
                     { name = "Discovered By", value = "`" .. localUsername .. "`", inline = true },
                     { name = "Server ID", value = "`" .. jobId .. "`", inline = true },
                     { name = "Rift Details", value = riftDetails, inline = false },
-                    { name = "🔗 Secure Join Link", value = "[**Click Here to Login & Join**]("..secureJoinUrl..")", inline = false }
+                    { name = "🔗 Join Link", value = "[**Click Here to Login & Join**]("..secureJoinUrl..")", inline = false }
                 },
                 thumbnail = { url = THUMBNAIL_URL }
             }
