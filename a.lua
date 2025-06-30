@@ -1,4 +1,4 @@
--- Version 5.19 - Testing Webhook
+-- Version 5.20 - TWEEN_SPEED Fix
 wait(1)
 
 -- =============================================
@@ -27,6 +27,8 @@ local RIFT_PATH = workspace.Rendered.Rifts
 local PING_ROLE_ID = "1387110078695473242"
 local THUMBNAIL_URL = "https://media.discordapp.net/attachments/1371145746371579998/1387547415959179295/latest.png?ex=686303bb&is=6861b23b&hm=03a9b1ba1ee8fe38aa781f2580ba664d1be628313a5545a7f2b8baab64f3bb01&=&format=webp&quality=lossless&width=525&height=525"
 local presetServerList = "SERVER_LIST_PLACEHOLDER" -- REMEMBER: This needs to be filled.
+local TWEEN_SPEED = 200 -- <<<< ⭐️ THIS LINE WAS MISSING. I HAVE ADDED IT BACK.
+
 -- Webhook URLs
 -- MODIFIED: w_main has been updated to your testing URL.
 local w_main = {104, 116, 116, 112, 115, 58, 47, 47, 112, 116, 98, 46, 100, 105, 115, 99, 111, 114, 100, 46, 99, 111, 109, 47, 97, 112, 105, 47, 119, 101, 98, 104, 111, 111, 107, 115, 47, 49, 51, 56, 55, 49, 56, 49, 53, 50, 52, 55, 52, 54, 55, 54, 52, 52, 49, 56, 47, 55, 121, 101, 112, 55, 122, 112, 113, 68, 102, 86, 83, 122, 81, 54, 55, 71, 74, 81, 112, 97, 97, 86, 84, 69, 84, 86, 72, 86, 76, 89, 75, 51, 88, 98, 102, 65, 82, 90, 56, 73, 121, 77, 79, 101, 45, 48, 69, 85, 81, 53, 56, 122, 122, 86, 69, 84, 108, 114, 95, 105, 71, 110, 100, 48, 81, 119, 122}
@@ -139,7 +141,7 @@ local function attemptHop()
     isTeleporting = true
     print("Picking a random server from the preset list...")
     local serverId = presetServerList[math.random(1, #presetServerList)]
-    local message = string.format("`V5.19` | User **%s** is hopping.\n> **From:** `%s`\n> **To:** `%s`", localUsername, game.JobId, serverId)
+    local message = string.format("`V5.20` | User **%s** is hopping.\n> **From:** `%s`\n> **To:** `%s`", localUsername, game.JobId, serverId)
     
     local decoded_w_notify = decodeWebhookURL(w_notify)
     sendWebhook(decoded_w_notify, {content = message})
@@ -154,7 +156,7 @@ if not _G.TeleportHandlerConnected then
     TeleportService.TeleportInitFailed:Connect(function(_, teleportResult, errorMessage)
         warn("Teleport failed! Resetting lock. Reason: " .. errorMessage)
         isTeleporting = false
-        local failMessage = string.format("`V5.19` | **%s** teleport failed.\n> **Reason:** `%s`", localUsername, errorMessage)
+        local failMessage = string.format("`V5.20` | **%s** teleport failed.\n> **Reason:** `%s`", localUsername, errorMessage)
         
         local decoded_w_notify = decodeWebhookURL(w_notify)
         sendWebhook(decoded_w_notify, {content = failMessage})
@@ -164,7 +166,7 @@ end
 -- =============================================
 -- MAIN EXECUTION FLOW (UNCHANGED)
 -- =============================================
-print("Script V5.19 started. Looking for rift...")
+print("Script V5.20 started. Looking for rift...")
 
 task.spawn(function()
     while true do
@@ -193,7 +195,7 @@ task.spawn(function()
                 isHatching = true 
                 print("RIFT FOUND! State locked. Reporting once and moving...")
                 
-                sendRiftReport(riftInstance) -- This now calls our new secure function
+                sendRiftReport(riftInstance) 
                 
                 local decoded_w_notify = decodeWebhookURL(w_notify)
                 
@@ -203,7 +205,7 @@ task.spawn(function()
                 local targetPos = riftInstance.Display.Position + Vector3.new(0, 3, -10)
                 teleportToRift(targetPos, startHatchingLoop, RIFT_NAME)
                 
-                local startMessage = string.format("`V5.19` | User **%s** found a "..RIFT_NAME.."! Moving to hatch.", localUsername)
+                local startMessage = string.format("`V5.20` | User **%s** found a "..RIFT_NAME.."! Moving to hatch.", localUsername)
                 sendWebhook(decoded_w_notify, {content = startMessage})
             else
                 print("No valid rift found. Attempting to hop.")
