@@ -19,7 +19,7 @@ local remoteEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Frame
 -- CONFIGURATION
 -- =============================================
 -- !!! IMPORTANT: REPLACE WITH YOUR REPLIT APP URL !!!
-local APP_URL = "https://<your-project-name>.<your-username>.replit.dev"
+local APP_URL = "https://be31aba3-c401-464e-9084-f2b02e3cf599-00-23cpv2oivnb6o.spock.replit.dev/"
 -- !!! IMPORTANT: REPLACE WITH YOUR REPLIT APP URL !!!
 
 local RIFT_NAME = "gift-rift"
