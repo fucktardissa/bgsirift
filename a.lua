@@ -22,7 +22,7 @@ local remoteEvent = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Frame
 local APP_URL = "https://<your-project-name>.<your-username>.replit.dev"
 -- !!! IMPORTANT: REPLACE WITH YOUR REPLIT APP URL !!!
 
-local RIFT_NAME = "bruh-egg"
+local RIFT_NAME = "gift-rift"
 local RIFT_PATH = workspace.Rendered.Rifts
 local PING_ROLE_ID = "1387110078695473242"
 local THUMBNAIL_URL = "https://media.discordapp.net/attachments/1371145746371579998/1387547415959179295/latest.png?ex=686303bb&is=6861b23b&hm=03a9b1ba1ee8fe38aa781f2580ba664d1be628313a5545a7f2b8baab64f3bb01&=&format=webp&quality=lossless&width=525&height=525"
