@@ -1,4 +1,4 @@
--- Version 9.7 - Updated All Webhooks
+-- Version 9.8 - Final Webhook & Chat Update
 wait(1)
 
 -- =============================================
@@ -26,7 +26,7 @@ local PING_ID_LEVEL15 = "1389815796896763964"
 local PING_ID_MEMBER = "1389791441244524584"
 
 --- HUNT TARGETS ---
-local RIFT_NAME = "gift-rift"
+local RIFT_NAME = "bruh-egg"
 local RIFT_THUMBNAIL_URL = "https://media.discordapp.net/attachments/1371145746371579998/1387547415959179295/latest.png?ex=686303bb&is=6861b23b&hm=03a9b1ba1ee8fe38aa781f2580ba664d1be628313a5545a7f2b8baab64f3bb01&=&format=webp&quality=lossless&width=525&height=525"
 local EVENT_EGG_NAME = "festival-rift-3"
 local EVENT_THUMBNAIL_URL = "https://media.discordapp.net/attachments/1386970256978743407/1389169576998338630/july4th-egg.png?ex=6863a47c&is=686252fc&hm=28cbfd94053a9716ba1ed201a34709c2afc8412324e5fe9e720cfd8fefa785d8&=&format=webp&quality=lossless&width=462&height=462"
@@ -196,8 +196,8 @@ local function generatePayload(reportType, targetInstance)
     return payload
 end
 
-local function broadcastRiftFoundAndWait(riftInstance)
-    local payload = generatePayload("RIFT", riftInstance)
+local function broadcastRiftFoundAndWait()
+    local payload = generatePayload("RIFT", {Name = RIFT_NAME, Display = {Position = Vector3.new(0,0,0)}})
     print("Broadcasting MAIN RIFT and waiting for staggered pings to complete...")
     
     payload.content = "A new `bruh-egg` has been found!"
@@ -269,12 +269,12 @@ local function attemptHop()
 
     -- ⭐️ MODIFIED: Updated chat message
     print("Sending pre-hop chat message...")
-    chatMessage("/ZdAJ7AsnYM BRUH RIFTS AND MORE EASY")
+    chatMessage("/irifts for FREE bruh egg and x25 rifts")
     task.wait(2)
     
     print("Picking a random server from the preset list...")
     local serverId = presetServerList[math.random(1, #presetServerList)]
-    local message = string.format("`V9.5` | User **%s** is hopping.\n> **From:** `%s`\n> **To:** `%s`", localUsername, game.JobId, serverId)
+    local message = string.format("`V9.6` | User **%s** is hopping.\n> **From:** `%s`\n> **To:** `%s`", localUsername, game.JobId, serverId)
     sendWebhook(decodeWebhookURL(w_notify), {content = message})
     task.wait(1)
     print("Initiating teleport now...")
@@ -286,7 +286,7 @@ if not _G.TeleportHandlerConnected then
     TeleportService.TeleportInitFailed:Connect(function(_, _, errorMessage)
         warn("Teleport failed! Resetting lock. Reason: " .. errorMessage)
         isTeleporting = false
-        local failMessage = string.format("`V9.5` | **%s** teleport failed.\n> **Reason:** `%s`", localUsername, errorMessage)
+        local failMessage = string.format("`V9.6` | **%s** teleport failed.\n> **Reason:** `%s`", localUsername, errorMessage)
         sendWebhook(decodeWebhookURL(w_notify), {content = failMessage})
     end)
 end
@@ -294,7 +294,7 @@ end
 -- =============================================
 -- MAIN EXECUTION FLOW (Simplified)
 -- =============================================
-print("Script V9.5 started. Hunting all targets...")
+print("Script V9.6 started. Hunting all targets...")
 
 task.spawn(function()
     while task.wait(5) do
