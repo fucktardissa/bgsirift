@@ -273,7 +273,7 @@ local function attemptHop()
     print("Server hopping. Reported rifts have been cleared for this server.")
 
     print("Sending pre-hop chat message...")
-    chatMessage("gg/hYTNYhqXaH BRUH RIFT & EVENT EGG RIFTS")
+    chatMessage("gg.ZdAJ7AsnYM FREE BRUH RIFT")
     task.wait(2)
     print("Picking a random server from the preset list...")
     local serverId = presetServerList[math.random(1, #presetServerList)]
