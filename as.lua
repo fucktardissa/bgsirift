@@ -26,7 +26,7 @@ local PING_ID_LEVEL15 = "1389815796896763964"
 local PING_ID_MEMBER = "1389791441244524584"
 
 --- HUNT TARGETS ---
-local RIFT_NAME = "bruh-egg"
+local RIFT_NAME = "gift-rift"
 local RIFT_THUMBNAIL_URL = "https://media.discordapp.net/attachments/1371145746371579998/1387547415959179295/latest.png?ex=686303bb&is=6861b23b&hm=03a9b1ba1ee8fe38aa781f2580ba664d1be628313a5545a7f2b8baab64f3bb01&=&format=webp&quality=lossless&width=525&height=525"
 local EVENT_EGG_NAME = "festival-rift-3"
 local EVENT_THUMBNAIL_URL = "https://media.discordapp.net/attachments/1386970256978743407/1389169576998338630/july4th-egg.png?ex=6863a47c&is=686252fc&hm=28cbfd94053a9716ba1ed201a34709c2afc8412324e5fe9e720cfd8fefa785d8&=&format=webp&quality=lossless&width=462&height=462"
