@@ -196,8 +196,8 @@ local function generatePayload(reportType, targetInstance)
     return payload
 end
 
-local function broadcastRiftFoundAndWait()
-    local payload = generatePayload("RIFT", {Name = RIFT_NAME, Display = {Position = Vector3.new(0,0,0)}})
+local function broadcastRiftFoundAndWait(targetRiftInstance)
+    local payload = generatePayload("RIFT", targetRiftInstance)
     print("Broadcasting MAIN RIFT and waiting for staggered pings to complete...")
     
     payload.content = "A new `bruh-egg` has been found!"
